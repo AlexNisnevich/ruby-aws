@@ -33,6 +33,12 @@ class MechanicalTurk
       end
     ssl = ( args[:UseSSL].nil? ? true : args[:UseSSL] )
     newargs = args.merge( :Name => name, :SoftwareName => software, :Host => @host, :UseSSL => ssl)
+    if args[:Transport].to_s =~ /^SOAP/i
+      unless Util::SOAPTransport.canSOAP?
+        log "Unable to use SOAP transport. Falling back to REST."
+        args[:Transport] = :REST
+      end
+    end
     transport = case args[:Transport]
       when :SOAP,/^SOAP/i
         getSOAPTransport(newargs)
